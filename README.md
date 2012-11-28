@@ -1,4 +1,4 @@
-bash-enviroment
+BASH Git Prompt
 ===============
 
 Customed powerfull bash prompt.
@@ -16,9 +16,9 @@ Features:
 
 Example:
 
-(wire@neuron)-(jobs:0)-(~/Projects/testing)
-(GIT: master | M: 0 A: 0 D: 1 U:->1 )
-(!1030)-> 
+    (wire@neuron)-(jobs:0)-(~/Projects/testing)
+    (GIT: master | M: 0 A: 0 D: 1 U:->1 )
+    (!1030)-> 
 
 
 More screenshots and demonstration on 
