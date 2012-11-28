@@ -1,0 +1,91 @@
+## Customization
+# COLORS
+NOC="\[[0m\]"
+WHITE="\[[1m\]"
+GREY="\[[2m\]"
+UNDERLINE="\[[4m\]"
+DEFACE="\[[9m\]"
+DARK="\[[30m\]"
+RED="\[[31m\]"
+GREEN="\[[32m\]"
+YELOW="\[[33m\]"
+BLUE="\[[34m\]"
+PINK="\[[35m\]"
+AZURE="\[[36m\]"
+BDARK="\[[40m\]"
+BRED="\[[41m\]"
+BGREEN="\[[42m\]"
+BYELOW="\[[43m\]"
+BBLUE="\[[44m\]"
+BPINK="\[[45m\]"
+BAZURE="\[[46m\]"
+BWHITE="\[[7m\]"
+HDARK="\[[90m\]"
+HRED="\[[91m\]"
+HGREEN="\[[92m\]"
+HYELOW="\[[93m\]"
+HBLUE="\[[94m\]"
+HPINK="\[[95m\]"
+HAZURE="\[[96m\]"
+
+
+function create_prompt {
+
+    gitpart=""
+    
+    if git ls-files ./ --error-unmatch >/dev/null 2>/dev/null ; then
+	stash=$(git stash list | wc -l)
+	mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^.M"|wc -l)
+	add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^A"|wc -l)
+	del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^.D"|wc -l)
+	
+	#git status local vs remote
+	status=$(git status | grep -e "^# Your branch is")
+
+	if echo $status | grep 'ahead' > /dev/null ; then
+		num=$(echo $status | grep -o "[0-9]*")
+		rstat=" ${AZURE}U:${HYELOW}->${HRED}$num$NOC"
+	elif echo $status | grep 'behind' > /dev/null ; then
+		num=$(echo $status | grep -o "[0-9]*")
+		rstat=" ${AZURE}U:${HYELOW}<-${HRED}$num$NOC"
+	else
+	    	rstat=""
+	fi
+
+
+
+	if [ $mod -gt 0 ] ; then 
+	    mod="$HRED$mod$HGREEN"
+	else
+	    mod="$NOC$WHITE$mod$HGREEN"
+	fi
+	if [ $add -gt 0 ] ; then 
+	    add="$HRED$add$HGREEN"
+	else
+	    add="$NOC$WHITE$add$HGREEN"
+	fi
+	if [ $del -gt 0 ] ; then 
+	    del="$HRED$del$HGREEN"
+	else
+	    del="$NOC$WHITE$del$HGREEN"
+	fi
+	if [ $stash -gt 0 ] ; then 
+	    stash=" ${AZURE}S: $RED$stash$HGREEN"
+	else
+	    stash=""
+	fi
+
+	repo=$(git branch | grep -e "^\*"| awk '{print $2}')
+	gitpart="\n(GIT: $repo | M: $mod A: $add D: $del$stash$rstat )"
+    fi
+
+    if [[ "$USER" == "root" ]] ; then 
+	    COLORPS=$NOC$HRED
+    else
+	    COLORPS=$NOC$WHITE
+    fi
+
+    PS1="\n$HGREEN($COLORPS\u@\h$HGREEN)-(${COLORPS}jobs:\j$HGREEN)-($COLORPS\w$HGREEN)$gitpart\n($COLORPS!\!$HGREEN)-> $NOC"
+
+}
+

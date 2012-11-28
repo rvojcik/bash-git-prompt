@@ -1,0 +1,21 @@
+Ctrl + a => Return to the start of the command you're typing
+Ctrl + e => Go to the end of the command you're typing
+Ctrl + y => Paste from the special clipboard that Ctrl + u and Ctrl + k save their data to
+Ctrl + t => Swap the two characters before the cursor (you can actually use this to transport a character from the left to the right, try it!)
+Ctrl + w => Delete the word / argument left of the cursor
+--------------------------------------------------------
+{one,two}sh | onesh twosh
+^old^new^   | exec prev comm, sub old->new
+sudo !!     | subs last comm
+cd !$       | last argument of prev comm         
+!! !^ !$ !!:n-m
+----------------- VIM ----------------------------------
+Macros:      record 'q' and play <times>@<register>
+Completion:  C-n word, C-x line
+Erasing:     C-w word, C-u line (insert mode)
+Markers:     m[a-x] , '[a-x] jump, d'[a-x][-a-x] del
+Folding:     :fold, zo, zc, mkview, loadview
+Case conv:   gu , gU, g~
+Jumping:     words:w,W,e,E,b,B 
+Indent:      C-t, C-d
+Search:      [I - show lines, set ignorecase|hlsearch
