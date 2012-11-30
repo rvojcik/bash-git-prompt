@@ -24,3 +24,21 @@ Example:
 More screenshots and demonstration on 
 
 https://github.com/rvojcik/bash-git-prompt/wiki/Demonstration
+
+
+INSTALLATION
+============
+
+Copy all '.bash' files to your home directory
+
+    git clone https://github.com/rvojcik/bash-git-prompt.git
+    cd bash-git-prompt
+    cp -rfp ./.bash* ~/
+
+If you have some own customization of these files, backup them first.
+
+    cd ~/
+    mkdir backup-files
+    cp -rfp ~/.bash* ~/backup-files/
+
+
