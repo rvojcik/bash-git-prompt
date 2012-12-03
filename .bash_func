@@ -35,9 +35,10 @@ function create_prompt {
     
     if git ls-files ./ --error-unmatch >/dev/null 2>/dev/null ; then
 	stash=$(git stash list | wc -l)
-	mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^.M"|wc -l)
-	add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^A"|wc -l)
-	del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -e "^.D"|wc -l)
+        mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}[RM]"|wc -l)
+        add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}A"|wc -l)
+        del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}D"|wc -l)
+
 	
 	#git status local vs remote
 	status=$(git status | grep -e "^# Your branch is")
