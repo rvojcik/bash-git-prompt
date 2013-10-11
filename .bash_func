@@ -34,55 +34,63 @@ function create_prompt {
     gitpart=""
     
     if git ls-files ./ --error-unmatch >/dev/null 2>/dev/null ; then
-	stash=$(git stash list | wc -l)
+        stash=$(git stash list | wc -l)
         mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}[RM]"|wc -l)
         add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}A"|wc -l)
         del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}D"|wc -l)
-	
-	#git status local vs remote
-	status=$(git status | grep -e "^# Your branch is")
 
-	if echo $status | grep 'ahead' > /dev/null ; then
-		num=$(echo $status | grep -o "[0-9]*")
-		rstat=" ${AZURE}U:${HYELOW}->${HRED}$num$NOC"
-	elif echo $status | grep 'behind' > /dev/null ; then
-		num=$(echo $status | grep -o "[0-9]*")
-		rstat=" ${AZURE}U:${HYELOW}<-${HRED}$num$NOC"
-	else
-	    	rstat=""
-	fi
+        # git submodules
+        if [ -e ./.gitmodules ] ; then 
+            submod=$(git submodule | wc -l)
+            submodule_info=" | ${HAZURE}SM: ${HYELOW}$submod$NOC"
+        else
+            submodule_info=""
+        fi
+
+        #git status local vs remote
+        status=$(git status | grep -e "^# Your branch is")
+
+        if echo $status | grep 'ahead' > /dev/null ; then
+            num=$(echo $status | grep -o "[0-9]*")
+            rstat=" ${AZURE}U:${HYELOW}->${HRED}$num$NOC"
+        elif echo $status | grep 'behind' > /dev/null ; then
+            num=$(echo $status | grep -o "[0-9]*")
+            rstat=" ${AZURE}U:${HYELOW}<-${HRED}$num$NOC"
+        else
+                rstat=""
+        fi
 
 
 
-	if [ $mod -gt 0 ] ; then 
-	    mod="$HRED$mod$HGREEN"
-	else
-	    mod="$NOC$WHITE$mod$HGREEN"
-	fi
-	if [ $add -gt 0 ] ; then 
-	    add="$HRED$add$HGREEN"
-	else
-	    add="$NOC$WHITE$add$HGREEN"
-	fi
-	if [ $del -gt 0 ] ; then 
-	    del="$HRED$del$HGREEN"
-	else
-	    del="$NOC$WHITE$del$HGREEN"
-	fi
-	if [ $stash -gt 0 ] ; then 
-	    stash=" ${AZURE}S: $RED$stash$HGREEN"
-	else
-	    stash=""
-	fi
+        if [ $mod -gt 0 ] ; then 
+            mod="$HRED$mod$HGREEN"
+        else
+            mod="$NOC$WHITE$mod$HGREEN"
+        fi
+        if [ $add -gt 0 ] ; then 
+            add="$HRED$add$HGREEN"
+        else
+            add="$NOC$WHITE$add$HGREEN"
+        fi
+        if [ $del -gt 0 ] ; then 
+            del="$HRED$del$HGREEN"
+        else
+            del="$NOC$WHITE$del$HGREEN"
+        fi
+        if [ $stash -gt 0 ] ; then 
+            stash=" ${AZURE}S: $RED$stash$HGREEN"
+        else
+            stash=""
+        fi
 
-	repo=$(git branch | grep -e "^\*"| awk '{print $2}')
-	gitpart="\n(GIT: $repo | M: $mod A: $add D: $del$stash$rstat )"
+        repo=$(git branch | grep -e "^\*"| awk '{print $2}')
+        gitpart="\n(GIT: $repo | M: $mod A: $add D: $del$stash$rstat$submodule_info )"
     fi
 
     if [[ "$USER" == "root" ]] ; then 
-	    COLORPS=$NOC$HRED
+        COLORPS=$NOC$HRED
     else
-	    COLORPS=$NOC$WHITE
+        COLORPS=$NOC$WHITE
     fi
 
     PS1="\n$HGREEN($COLORPS\u@\h$HGREEN)-(${COLORPS}jobs:\j$HGREEN)-($COLORPS\w$HGREEN)$gitpart\n($COLORPS!\!$HGREEN)-> $NOC"
