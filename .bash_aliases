@@ -14,7 +14,7 @@ alias br='git branch -v -a'
 alias gdiff='git diff'
 alias bnew='git checkout -b'
 alias log='git log --graph --pretty=format:"%h %s | %cn ( %ce )"'
-alias logd='git log --graph --pretty=format:"%Cblue%cr%Creset | %Cred%h %Cgreen%s%Creset| %cn ( %ce )"'
+alias logd='git log --graph --pretty=format:"%Cblue%cr%Creset | %Cred%h %Cgreen%s%Creset| %cn ( %ce )" %Cblue%d'
 
 
 # some more ls aliases
