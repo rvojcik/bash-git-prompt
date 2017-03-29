@@ -48,7 +48,7 @@ function create_prompt {
         fi
 
         #git status local vs remote
-        status=$(git status | grep -e "^# Your branch is")
+        status=$(git status | grep -e "^.*Your branch is")
 
         if echo $status | grep 'ahead' > /dev/null ; then
             num=$(echo $status | grep -o "[0-9]*")
