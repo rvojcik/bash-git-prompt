@@ -1,3 +1,8 @@
+# Global configuration
+export KUBE_PROMPT=true
+export GIT_PROMPT=true
+
+
 ## Customization
 # COLORS
 NOC="\[[0m\]"
@@ -28,72 +33,213 @@ HBLUE="\[[94m\]"
 HPINK="\[[95m\]"
 HAZURE="\[[96m\]"
 
+# Colors
+_NOC="[0m"
+_WHITE="[1m"
+_GREY="[2m"
+_UNDERLINE="[4m"
+_DEFACE="[9m"
+_DARK="[30m"
+_RED="[31m"
+_GREEN="[32m"
+_YELOW="[33m"
+_BLUE="[34m"
+_PINK="[35m"
+_AZURE="[36m"
+_BDARK="[40m"
+_BRED="[41m"
+_BGREEN="[42m"
+_BYELOW="[43m"
+_BBLUE="[44m"
+_BPINK="[45m"
+_BAZURE="[46m"
+_BWHITE="[7m"
+_HDARK="[90m"
+_HRED="[91m"
+_HGREEN="[92m"
+_HYELOW="[93m"
+_HBLUE="[94m"
+_HPINK="[95m"
+_HAZURE="[96m"
+
+# Base color of the prompt
+# Change to whatever you like
+PROMPTBASECOL=${AZURE}
+
+# Checkstate function
+# Useful for inline scripting
+function check_state {
+    state=$?
+    if [ $state = 0 ] ; then
+        echo -n "${NOC}[ ${GREEN}OK ${NOC}]"
+    else
+        echo -n "${NOC}[ ${RED}FAILED ${NOC}]"
+    fi
+
+    echo " $*"
+    return $state
+
+}
+# Random string generator
+# Generate random password 
+function randpass {
+
+    if [ -z $1 ] ; then 
+    MAXSIZE=10
+    else
+    MAXSIZE=$1
+    fi
+
+    array1=( 
+    q w e r t y u i o p a s d f g h j k l z x c v b n m Q W E R T Y U I O P A S D 
+    F G H J K L Z X C V B N M 1 2 3 4 5 6 7 8 9 0   
+    )
+    MODNUM=${#array1[*]}
+    pwd_len=0
+    RANDPASS=""
+
+    while [ $pwd_len -lt $MAXSIZE ] 
+    do
+    index=$(($RANDOM%$MODNUM))
+    RANDPASS=$RANDPASS${array1[$index]} 
+    ((pwd_len++))
+    done
+
+    echo $RANDPASS
+    
+}
+
+function fix_ssh_key {
+    host=$1
+    for i in $host $(dig +short $host) ; do
+        ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$i"
+    done
+}
+
+# Enable or disable kubeprompt
+function kubeprompt {
+    case $1 in 
+    "on")
+        export KUBE_PROMPT=true
+    ;;
+    "off")
+        unset KUBE_PROMPT
+    ;;
+    esac
+}
+
+# Enable or disable git prompt
+function gitprompt {
+    case $1 in 
+    "on")
+        export GIT_PROMPT=true
+    ;;
+    "off")
+        export GIT_PROMPT=false
+        unset gitpart
+    ;;
+    esac
+}
+
+function create_prompt_kube {
+    if [[ "$KUBE_PROMPT" == "true" ]] ; then
+        if which kubectl &> /dev/null ; then
+            cur_context=$(kubectl config current-context)
+            cur_namespace=$(kubectl config get-contexts | grep '^*' | grep -E -o '[A-Za-z0-9_-]+$')
+            echo -e "\n${PROMPTBASECOL}> KUB: ${WHITE}$cur_context${NOC}${PROMPTBASECOL} N: ${WHITE}$cur_namespace${NOC}"
+        fi
+    fi
+}
+
+function create_prompt_git {
+    if [[ "$GIT_PROMPT" != "false" ]] ; then
+        if which git &> /dev/null ; then
+            gitpart=""
+            if ! [[ $PWD == *buildsystem-tags* ]] ; then
+                if git ls-files ./ --error-unmatch >/dev/null 2>/dev/null ; then
+                stash=$(git stash list | wc -l)
+                mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}[RM]"|wc -l)
+                add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}A"|wc -l)
+                del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}D"|wc -l)
+
+                # git submodules
+                if [ -e ./.gitmodules ] ; then 
+                    submod=$(git submodule | wc -l)
+                    submodule_info=" | ${HAZURE}SM: ${HYELOW}$submod$NOC"
+                else
+                    submodule_info=""
+                fi
+                
+                #git status local vs remote
+                status=$(git status | grep -e "^.*Your branch is")
+
+                if echo $status | grep 'ahead' > /dev/null ; then
+                    num=$(echo $status | grep -o "[0-9]*")
+                    rstat=" ${AZURE}U:${HYELOW}->${HRED}$num$NOC"
+                elif echo $status | grep 'behind' > /dev/null ; then
+                    num=$(echo $status | grep -o "[0-9]*")
+                    rstat=" ${AZURE}U:${HYELOW}<-${HRED}$num$NOC"
+                else
+                        rstat=""
+                fi
+
+
+
+                if [ $mod -gt 0 ] ; then 
+                    mod="$HRED$mod$NOC$PROMPTBASECOL"
+                else
+                    mod="$NOC$WHITE$mod$NOC$PROMPTBASECOL"
+                fi
+                if [ $add -gt 0 ] ; then 
+                    add="$HRED$add$NOC$PROMPTBASECOL"
+                else
+                    add="$NOC$WHITE$add$NOC$PROMPTBASECOL"
+                fi
+                if [ $del -gt 0 ] ; then 
+                    del="$HRED$del$NOC$PROMPTBASECOL"
+                else
+                    del="$NOC$WHITE$del$NOC$PROMPTBASECOL"
+                fi
+                if [ $stash -gt 0 ] ; then 
+                    stash=" ${AZURE}S: $RED$stash$PROMPTBASECOL"
+                else
+                    stash=""
+                fi
+
+                repo=$(git branch | grep -e "^\*"| awk '{print $2}')
+                gitpart="\n${PROMPTBASECOL}> GIT: $repo | M: $mod A: $add D: $del$stash$rstat$submodule_info"
+                fi
+
+                if [[ "$USER" == "root" ]] ; then 
+                    COLORPS=$NOC$HRED
+                else
+                    COLORPS=$NOC$WHITE
+                fi
+            else
+                gitpart=""
+            fi
+            echo "$gitpart"
+        fi
+    fi
+}
 
 function create_prompt {
 
-    gitpart=""
-    
-    if git ls-files ./ --error-unmatch >/dev/null 2>/dev/null ; then
-        stash=$(git stash list | wc -l)
-        mod=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}[RM]"|wc -l)
-        add=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}A"|wc -l)
-        del=$(git status -s --porcelain | egrep -v "^\?\?"| grep -E "^.{0,1}D"|wc -l)
-
-        # git submodules
-        if [ -e ./.gitmodules ] ; then 
-            submod=$(git submodule | wc -l)
-            submodule_info=" | ${HAZURE}SM: ${HYELOW}$submod$NOC"
-        else
-            submodule_info=""
-        fi
-
-        #git status local vs remote
-        status=$(git status | grep -e "^.*Your branch is")
-
-        if echo $status | grep 'ahead' > /dev/null ; then
-            num=$(echo $status | grep -o "[0-9]*")
-            rstat=" ${AZURE}U:${HYELOW}->${HRED}$num$NOC"
-        elif echo $status | grep 'behind' > /dev/null ; then
-            num=$(echo $status | grep -o "[0-9]*")
-            rstat=" ${AZURE}U:${HYELOW}<-${HRED}$num$NOC"
-        else
-                rstat=""
-        fi
+    last_command=$?
+    time_now=$(date +"%H:%M:%S")
 
 
-
-        if [ $mod -gt 0 ] ; then 
-            mod="$HRED$mod$HGREEN"
-        else
-            mod="$NOC$WHITE$mod$HGREEN"
-        fi
-        if [ $add -gt 0 ] ; then 
-            add="$HRED$add$HGREEN"
-        else
-            add="$NOC$WHITE$add$HGREEN"
-        fi
-        if [ $del -gt 0 ] ; then 
-            del="$HRED$del$HGREEN"
-        else
-            del="$NOC$WHITE$del$HGREEN"
-        fi
-        if [ $stash -gt 0 ] ; then 
-            stash=" ${AZURE}S: $RED$stash$HGREEN"
-        else
-            stash=""
-        fi
-
-        repo=$(git branch | grep -e "^\*"| awk '{print $2}')
-        gitpart="\n(GIT: $repo | M: $mod A: $add D: $del$stash$rstat$submodule_info )"
-    fi
-
-    if [[ "$USER" == "root" ]] ; then 
-        COLORPS=$NOC$HRED
+    if [ $last_command -ne 0 ] ; then
+        lastcmdpart="${HRED}(!)${NOC}"
     else
-        COLORPS=$NOC$WHITE
+        lastcmdpart=""
     fi
 
-    PS1="\n$HGREEN($COLORPS\u@\h$HGREEN)-(${COLORPS}jobs:\j$HGREEN)-($COLORPS\w$HGREEN)$gitpart\n($COLORPS!\!$HGREEN)-> $NOC"
+    PS1="$(create_prompt_kube)$(create_prompt_git) $lastcmdpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
 
 }
+
+if [ -x `which kubectl` ] ; then
+    source <(kubectl completion bash)
+fi
 
