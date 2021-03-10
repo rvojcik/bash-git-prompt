@@ -22,13 +22,17 @@ In first we execute command false, so you can see indication on the next prompt 
 
 ![git prompt](img/bash_git_basics.png)
 
-Prompt automatically detect that you are in GIT repository and display some basic git info like actual REF, Modified files, Added files and Deleted file. It can also detect Git Submodules and gives you indication of that or if you have stashed changes in git
+* Prompt automatically detect that you are in GIT repository and display some basic git info like actual REF, Modified files, Added files and Deleted file. 
+* It can also detect Git Submodules and gives you indication of that
+* It inform you if you have stashed changes in git
+* you can turn off git prompt permanently in `.bash_func` or temporarly with `gitprompt off`
 
 ### Kubernetes
 
 ![kube prompt](img/bash_kube_basics.png)
 
-For kubernetes you can see current active context and default namespace for that context.
+* For kubernetes you can see current active context and default namespace for that context.
+* you can turn off kube prompt permanently in `.bash_func` or temporarly with `kubeprompt off`
 
 ### Some usefull aliases
 
