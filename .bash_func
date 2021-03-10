@@ -2,9 +2,8 @@
 export KUBE_PROMPT=true
 export GIT_PROMPT=true
 
-
 ## Customization
-# COLORS
+# COLORS for bash prompt
 NOC="\[[0m\]"
 WHITE="\[[1m\]"
 GREY="\[[2m\]"
@@ -62,12 +61,15 @@ _HBLUE="[94m"
 _HPINK="[95m"
 _HAZURE="[96m"
 
-# Base color of the prompt
-# Change to whatever you like
+# Bash prompt base color
 PROMPTBASECOL=${AZURE}
 
 # Checkstate function
-# Useful for inline scripting
+# Usefull for oneliners
+# Example
+# ....command
+# check_state "This is state of previous command"
+#
 function check_state {
     state=$?
     if [ $state = 0 ] ; then
@@ -81,7 +83,6 @@ function check_state {
 
 }
 # Random string generator
-# Generate random password 
 function randpass {
 
     if [ -z $1 ] ; then 
@@ -116,7 +117,6 @@ function fix_ssh_key {
     done
 }
 
-# Enable or disable kubeprompt
 function kubeprompt {
     case $1 in 
     "on")
@@ -127,8 +127,6 @@ function kubeprompt {
     ;;
     esac
 }
-
-# Enable or disable git prompt
 function gitprompt {
     case $1 in 
     "on")
@@ -151,7 +149,11 @@ function create_prompt_kube {
     fi
 }
 
-function create_prompt_git {
+function create_prompt {
+
+    last_command=$?
+    time_now=$(date +"%H:%M:%S")
+
     if [[ "$GIT_PROMPT" != "false" ]] ; then
         if which git &> /dev/null ; then
             gitpart=""
@@ -218,16 +220,8 @@ function create_prompt_git {
             else
                 gitpart=""
             fi
-            echo "$gitpart"
         fi
     fi
-}
-
-function create_prompt {
-
-    last_command=$?
-    time_now=$(date +"%H:%M:%S")
-
 
     if [ $last_command -ne 0 ] ; then
         lastcmdpart="${HRED}(!)${NOC}"
@@ -235,7 +229,7 @@ function create_prompt {
         lastcmdpart=""
     fi
 
-    PS1="$(create_prompt_kube)$(create_prompt_git) $lastcmdpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
+    PS1="$(create_prompt_kube)$gitpart $lastcmdpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
 
 }
 
