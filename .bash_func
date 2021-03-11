@@ -224,12 +224,12 @@ function create_prompt {
     fi
 
     if [ $last_command -ne 0 ] ; then
-        lastcmdpart="${HRED}(!)${NOC}"
+        lastcmdpart="${HRED}(!)${NOC} "
     else
         lastcmdpart=""
     fi
 
-    PS1="$(create_prompt_kube)$gitpart $lastcmdpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
+    PS1="$(create_prompt_kube)$gitpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n${lastcmdpart}$PROMPTBASECOL($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
 
 }
 
