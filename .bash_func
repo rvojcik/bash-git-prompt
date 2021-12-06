@@ -161,11 +161,9 @@ function create_prompt_kube {
 }
 function create_prompt_gituser {
     if [[ "$GITUSER_PROMPT" == "true" ]] ; then
-        if which kubectl &> /dev/null ; then
-            cur_gitname=$(git config user.name)
-            cur_gitemail=$(git config user.email)
-            echo -e "\n${PROMPTBASECOL}> GIT.NAME: ${WHITE}$cur_gitname${NOC}${PROMPTBASECOL} GIT.EMAIL: ${WHITE}$cur_gitemail${NOC}"
-        fi
+        cur_gitname=$(git config user.name)
+        cur_gitemail=$(git config user.email)
+        echo -e "\n${PROMPTBASECOL}> GIT.NAME: ${WHITE}$cur_gitname${NOC}${PROMPTBASECOL} GIT.EMAIL: ${WHITE}$cur_gitemail${NOC}"
     fi
 }
 
