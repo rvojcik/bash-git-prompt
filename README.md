@@ -27,6 +27,13 @@ In first we execute command false, so you can see indication on the next prompt 
 * It inform you if you have stashed changes in git
 * you can turn off git prompt permanently in `.bash_func` or temporarly with `gitprompt off`
 
+### GIT USER
+
+![gituser prompt](img/bash_gituser_basics.png)
+
+* For gitlab you can see your gitlab user.name and email
+* you can turn off gituser prompt permanently in `.bash_func` or temporarly with `gituserprompt off`
+
 ### Kubernetes
 
 ![kube prompt](img/bash_kube_basics.png)

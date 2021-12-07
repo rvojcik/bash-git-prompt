@@ -1,6 +1,7 @@
 # Global configuration
 export KUBE_PROMPT=true
 export GIT_PROMPT=true
+export GITUSER_PROMPT=true
 
 ## Customization
 # COLORS for bash prompt
@@ -127,6 +128,16 @@ function kubeprompt {
     ;;
     esac
 }
+function gituserprompt {
+    case $1 in 
+    "on")
+        export GITUSER_PROMPT=true
+    ;;
+    "off")
+        unset GITUSER_PROMPT
+    ;;
+    esac
+}
 function gitprompt {
     case $1 in 
     "on")
@@ -146,6 +157,13 @@ function create_prompt_kube {
             cur_namespace=$(kubectl config get-contexts | grep '^*' | grep -E -o '[A-Za-z0-9_-]+$')
             echo -e "\n${PROMPTBASECOL}> KUB: ${WHITE}$cur_context${NOC}${PROMPTBASECOL} N: ${WHITE}$cur_namespace${NOC}"
         fi
+    fi
+}
+function create_prompt_gituser {
+    if [[ "$GITUSER_PROMPT" == "true" ]] ; then
+        cur_gitname=$(git config user.name)
+        cur_gitemail=$(git config user.email)
+        echo -e "\n${PROMPTBASECOL}> GIT.NAME: ${WHITE}$cur_gitname${NOC}${PROMPTBASECOL} GIT.EMAIL: ${WHITE}$cur_gitemail${NOC}"
     fi
 }
 
@@ -229,7 +247,7 @@ function create_prompt {
         lastcmdpart=""
     fi
 
-    PS1="$(create_prompt_kube)$gitpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n${lastcmdpart}$PROMPTBASECOL($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
+    PS1="$(create_prompt_kube)$(create_prompt_gituser)$gitpart\n$PROMPTBASECOL($COLORPS\u@\h$NOC$PROMPTBASECOL)-(${COLORPS}$time_now$NOC$PROMPTBASECOL)-($COLORPS\w$NOC$PROMPTBASECOL)\n${lastcmdpart}$PROMPTBASECOL($COLORPS!\!$NOC$PROMPTBASECOL)-> $NOC"
 
 }
 
